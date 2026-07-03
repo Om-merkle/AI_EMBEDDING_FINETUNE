@@ -43,6 +43,10 @@ def finetune() -> dict[str, Any]:
         train_ds = triplets
 
     model = SentenceTransformer(settings.base_model, device=settings.device)
+    # Cap sequence length to keep training memory in check on a single T4. Each triplet
+    # feeds 3 texts through the model, so activation memory scales with seq length.
+    if model.max_seq_length and model.max_seq_length > 256:
+        model.max_seq_length = 256
     loss = MultipleNegativesRankingLoss(model)
 
     args = SentenceTransformerTrainingArguments(

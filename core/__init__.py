@@ -14,3 +14,13 @@ Note: submodules import `from core.config import settings` directly. This __init
 kept import-light on purpose (it does NOT pull in torch), so lightweight modules like
 `core.jobs` can be used without the heavy ML stack installed.
 """
+
+import os
+
+# Force single-GPU by default. sentence-transformers' in-batch-negative losses (e.g.
+# MultipleNegativesRankingLoss) don't work with PyTorch DataParallel on multi-GPU boxes
+# (like Kaggle's 2x T4): every replica's embeddings get gathered onto GPU 0, which then
+# OOMs. One T4 is plenty for bge-small. This runs before any submodule imports torch, so
+# torch only ever sees a single device. Multi-GPU users can override by exporting
+# CUDA_VISIBLE_DEVICES themselves (setdefault respects an existing value).
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "0")

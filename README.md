@@ -47,7 +47,7 @@ prepare data → collect triplets → MTEB/IR baseline → fine-tune → evaluat
 2. Kaggle → **Create → Notebook**. In **Settings**: **Accelerator = GPU T4 ×2**, **Internet = On**.
 3. Open `notebooks/run_on_kaggle.ipynb` (or paste its cells), set your repo URL, and run:
    - **Cell 1** — `git clone` + `pip install -r requirements.txt`
-   - **Path A** — `!python run_pipeline.py --domain fiqa --base-model BAAI/bge-small-en-v1.5 --epochs 1 --batch-size 64`
+   - **Path A** — `!python run_pipeline.py --domain fiqa --base-model BAAI/bge-small-en-v1.5 --epochs 1 --batch-size 32`
    - print `results/comparison.json` → **fine-tuned nDCG@10 should beat the baseline**.
 4. The model (`models/`) and metrics (`results/`) show up in the notebook's **Output** tab to download.
 5. *(Optional)* **Path B** runs the FastAPI + Streamlit UI behind a public `cloudflared` URL.
