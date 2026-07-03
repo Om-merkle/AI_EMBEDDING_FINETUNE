@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Secrets
+.env
+
+# Generated artifacts
+data/
+models/
+results/
+mteb_results/
+*.jsonl
+
+# Notebooks
+.ipynb_checkpoints/
