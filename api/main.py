@@ -13,7 +13,9 @@ from typing import Callable
 
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 
-from core import baseline, compare, data_prep, evaluate, jobs, llm_triplet_gen, train, triplet_mining
+from core import (
+    baseline, compare, data_prep, evaluate, jobs, leaderboard, llm_triplet_gen, train, triplet_mining,
+)
 from core.config import settings
 from api.schemas import ConfigUpdate, Job, JobRef
 
@@ -112,6 +114,12 @@ def get_compare() -> dict[str, object]:
         return compare.diff()
     except FileNotFoundError as exc:
         raise HTTPException(status_code=409, detail=str(exc))
+
+
+@app.get("/leaderboard")
+def get_leaderboard() -> dict[str, object]:
+    """Ranked table of all runs logged to results/leaderboard.csv (best first)."""
+    return {"rows": leaderboard.load_rows()}
 
 
 @app.get("/results/{name}")

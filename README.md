@@ -85,3 +85,20 @@ If no key is set, this path is skipped automatically — mining remains the defa
 
 `results/comparison.json` shows the base vs fine-tuned model side by side. Success = the fine-tuned
 **IR nDCG@10** (and the official **MTEB FiQA2018 nDCG@10**) is measurably higher than the baseline.
+
+## Per-run leaderboard
+
+Every run appends its metrics to `results/leaderboard.csv` and prints a ranked table (best first),
+so you can compare experiments — different base models, epochs, batch sizes, or domains. Tag a run
+with `--run-label`:
+```bash
+python run_pipeline.py --base-model BAAI/bge-small-en-v1.5 --run-label bge-1ep
+python run_pipeline.py --base-model sentence-transformers/all-MiniLM-L6-v2 --run-label minilm-1ep
+```
+View it any time (ranked by MTEB nDCG@10, then IR nDCG@10):
+```python
+from core import leaderboard
+print(leaderboard.show())          # text table
+leaderboard.to_dataframe()         # pandas DataFrame (nice in a notebook)
+```
+Or via the API: `GET /leaderboard`. The CSV persists across runs and downloads from Kaggle's Output tab.

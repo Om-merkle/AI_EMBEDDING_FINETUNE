@@ -33,6 +33,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--no-mteb", action="store_true", help="skip the official MTEB task (faster)")
     p.add_argument("--llm-triplets", action="store_true",
                    help="use gpt-5.4-nano synthetic triplets instead of hard-negative mining")
+    p.add_argument("--run-label", default="",
+                   help="short name for this run, shown in the leaderboard")
     return p.parse_args()
 
 
@@ -52,7 +54,9 @@ def main() -> None:
     apply_args(args)
 
     # Imported after settings are applied so each stage sees the final config.
-    from core import baseline, compare, data_prep, evaluate, llm_triplet_gen, train, triplet_mining
+    from core import (
+        baseline, compare, data_prep, evaluate, leaderboard, llm_triplet_gen, train, triplet_mining,
+    )
 
     print(f"[device] {settings.device}  |  base_model={settings.base_model}  domain={settings.domain}")
 
@@ -60,10 +64,8 @@ def main() -> None:
     print(json.dumps(data_prep.build_pairs(), indent=2))
 
     print("\n[2/6] Collecting triplets ...")
-    if args.llm_triplets:
-        print(json.dumps(llm_triplet_gen.generate(), indent=2))
-    else:
-        print(json.dumps(triplet_mining.mine(), indent=2))
+    triplet_info = llm_triplet_gen.generate() if args.llm_triplets else triplet_mining.mine()
+    print(json.dumps(triplet_info, indent=2))
 
     print("\n[3/6] MTEB / IR baseline (base model) ...")
     print(json.dumps(baseline.run(), indent=2))
@@ -81,6 +83,11 @@ def main() -> None:
     delta = result.get("headline_ir_ndcg@10_delta")
     verdict = "IMPROVED" if result.get("improved") else "NO IMPROVEMENT"
     print(f"\n=== DONE: IR nDCG@10 delta = {delta}  ->  {verdict} ===")
+
+    # Log this run and print the ranked leaderboard of all runs so far.
+    leaderboard.record(run_label=args.run_label, num_triplets=triplet_info.get("num_triplets"))
+    print("\n=== LEADERBOARD (best first) ===")
+    print(leaderboard.show())
 
 
 if __name__ == "__main__":
