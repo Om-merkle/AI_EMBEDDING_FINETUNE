@@ -41,9 +41,6 @@ prepare data → collect triplets → MTEB/IR baseline → fine-tune → evaluat
 
 ## ▶️ Run on Kaggle (recommended — free T4 GPU)
 
-Your Dell Intel Core Ultra 5 is **CPU-only** (no NVIDIA GPU), so real training belongs on Kaggle.
-**No TPU needed** — a T4 is plenty for `bge-small`.
-
 **One-time:** sign in at kaggle.com → verify your phone (unlocks GPU + Internet).
 
 1. Push this project to GitHub *(or upload it as a Kaggle Dataset).*
